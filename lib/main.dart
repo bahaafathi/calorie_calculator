@@ -26,6 +26,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
   double weight = 0.0;
   double height = 0.0;
   double age = 0.0;
@@ -72,16 +75,19 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 16.0),
             TextFormField(
+              controller: weightController,
               keyboardType: TextInputType.number,
               onChanged: (value) => weight = double.parse(value),
               decoration: InputDecoration(labelText: 'Weight (kg)'),
             ),
             TextFormField(
+              controller: heightController,
               keyboardType: TextInputType.number,
               onChanged: (value) => height = double.parse(value),
               decoration: InputDecoration(labelText: 'Height (cm)'),
             ),
             TextFormField(
+              controller: ageController,
               keyboardType: TextInputType.number,
               onChanged: (value) => age = double.parse(value),
               decoration: InputDecoration(labelText: 'Age (years)'),
@@ -111,9 +117,27 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                calculateCalories();
+                if (weight == 0.0 || height == 0.0 || age == 0.0) {
+                  // Display a SnackBar if any of the values are not entered
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        'Please enter values for weight, height, and age.'),
+                    duration: Duration(seconds: 10),
+                  ));
+                } else {
+                  // Calculate calories if values are provided
+                  calculateCalories();
+                }
               },
               child: Text('Calculate'),
+            ),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                // Clear all entered values
+                _resetValues();
+              },
+              child: Text('Reset'),
             ),
             SizedBox(height: 16.0),
             Text('Estimated Daily Calories: $result'),
@@ -121,6 +145,17 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void _resetValues() {
+    setState(() {
+      weightController.clear();
+      heightController.clear();
+      ageController.clear();
+      result = 0.0;
+      selectedGender = 'Male';
+      selectedActivityLevel = 'Sedentary';
+    });
   }
 
   void calculateCalories() {
